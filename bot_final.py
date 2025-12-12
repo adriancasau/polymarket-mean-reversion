@@ -369,7 +369,5 @@ def buy_with_price_cap(token_id: str, max_price: float, max_size: float):
             send_telegram_message(msg)
             return None
 
-
-
 if __name__ == "__main__":
     run_signal_watcher()
