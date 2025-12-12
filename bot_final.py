@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # VARIABLES A TOCAR SI ES NECESARIO
-shares = 13.7
+shares = 22.1
 prob_acertar = 0.90
 tiempo_antes_cerrar = 600
 
@@ -299,26 +299,76 @@ def send_telegram_message(text: str) -> None:
 
 def buy_with_price_cap(token_id: str, max_price: float, max_size: float):
     """
-    Compra limit con tope max_price (GTC).
+    Compra limit con tope max_price (GTC) con reintentos ante errores transitorios (p.ej. PolyApiException 500).
     - Nunca pagarás más de max_price.
-    - La orden puede quedarse en el libro hasta que el bot la cancele.
+    - Reintenta con backoff exponencial.
     """
     order = OrderArgs(
         token_id=token_id,
-        price=max_price,   # ← tope de precio (0.51 en tu caso)
-        size=max_size,     # nº de shares máximo que quieres
+        price=max_price,
+        size=max_size,
         side=BUY,
     )
-    
+
+    MAX_RETRIES = 6
+    BASE_SLEEP = 1.0
+    CAP_SLEEP = 20.0
+
+    # Creamos la orden firmada una vez (es más estable y evita trabajo repetido)
     signed = client.create_order(order)
-    try:
-        resp = client.post_order(signed, OrderType.GTC)  # GTC: Good-Till-Cancelled
-        return resp
-    except Exception as e:
-        msg = f"No se pudo colocar GTC a {max_price} para token {token_id}: {type(e).__name__}: {e}"
-        print(msg)
-        send_telegram_message(msg)
-        return None
+
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            return client.post_order(signed, OrderType.GTC)
+
+        except PolyApiException as e:
+            # Reintentar solo si parece error transitorio del servidor (500 / execution)
+            status = getattr(e, "status_code", None)
+            msg_e = str(e)
+            retryable = (
+                status == 500
+                or "status_code=500" in msg_e
+                or "could not run the execution" in msg_e
+            )
+
+            if retryable and attempt < MAX_RETRIES:
+                sleep_s = min(CAP_SLEEP, BASE_SLEEP * (2 ** (attempt - 1)))
+                time.sleep(sleep_s)
+                continue
+
+            msg = (
+                f"No se pudo colocar GTC a {max_price} para token {token_id}: "
+                f"{type(e).__name__}: {e}"
+            )
+            print(msg)
+            send_telegram_message(msg)
+            return None
+
+        except (RequestException, TimeoutError, ConnectionError) as e:
+            # Errores de red: reintentar también
+            if attempt < MAX_RETRIES:
+                sleep_s = min(CAP_SLEEP, BASE_SLEEP * (2 ** (attempt - 1)))
+                time.sleep(sleep_s)
+                continue
+
+            msg = (
+                f"No se pudo colocar GTC a {max_price} para token {token_id}: "
+                f"{type(e).__name__}: {e}"
+            )
+            print(msg)
+            send_telegram_message(msg)
+            return None
+
+        except Exception as e:
+            # Otros errores: no asumimos que sean retryables
+            msg = (
+                f"No se pudo colocar GTC a {max_price} para token {token_id}: "
+                f"{type(e).__name__}: {e}"
+            )
+            print(msg)
+            send_telegram_message(msg)
+            return None
+
 
 
 if __name__ == "__main__":
