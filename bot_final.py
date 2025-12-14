@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # VARIABLES A TOCAR SI ES NECESARIO
-shares = 22.1
+shares = 29.1
 prob_acertar = 0.90
 tiempo_antes_cerrar = 600
 
