@@ -45,7 +45,7 @@ To calculate the edge (profitability) on the capital risked:
 $$ROI = \frac{EV}{Cost} \times 100$$
 $$ROI = \frac{0.038}{0.51} \times 100 \approx \mathbf{7.45\%}$$
 
-**Theoretical conclusion:** Ignoring implementation noise, every trade executed at the limit price would have a mathematical edge of **~7.45%** over the market in the long run.
+**Theoretical conclusion:** Every trade executed at the limit price would have a mathematical edge of **~7.45%** over the market in the long run.
 
 ---
 
