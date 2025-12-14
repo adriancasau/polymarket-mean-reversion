@@ -87,7 +87,7 @@ $$ROI_{real} = \frac{EV_{real}}{Cost} \times 100 = \frac{0.0332}{0.51} \times 10
 
 **Real-world conclusion:** After discounting a 10% rate of false entries, the edge drops from **7.45%** to roughly **6.5%**, but it remains clearly positive.
 
-This 10% discount is implemented in the code as an effective **“signal quality” of 90%**. We deliberately use this conservative factor because:
+So why not use a higher target to have less false entries? We deliberately use this conservative target because:
 
 * There are **other traders running similar (or same) mean reversion strategies** on the same Polymarket markets.
 * **Liquidity is limited**, so we want our order to be **first in the book** to get filled.
