@@ -1,4 +1,4 @@
-# 📈 Polymarket BTC Reversion Bot (15min)
+#  Polymarket BTC Reversion Bot (15min)
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![Platform](https://img.shields.io/badge/Platform-Polymarket-green)
@@ -10,7 +10,7 @@ It implements a **mean reversion strategy** based on statistical analysis of con
 
 ---
 
-## 🧠 The Strategy
+##  The Strategy
 
 The core logic relies on the conditional probability of a trend reversal following a short, sustained movement in 15-minute intervals.
 
@@ -95,7 +95,7 @@ So why not use a higher target to have less false entries? We deliberately use t
 
 ---
 
-## ⚙️ Key Features
+##  Key Features
 
 * **⚡ Direct CLOB Integration:** Uses `py_clob_client` to trade directly on the Layer 2 Polygon order book for maximum speed and minimal fees.
 * **🛡️ Smart Order Management:**
@@ -109,7 +109,7 @@ So why not use a higher target to have less false entries? We deliberately use t
 
 ---
 
-## 📋 Requirements
+##  Requirements
 
 * **Python 3.10+**
 * **Polymarket Account:** Must have funds deposited on the Polygon network (USDC.e).
